@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Birthday Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative&family=Dancing+Script&family=Playfair+Display&family=Special+Elite&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        body {
+            font-family: 'Cinzel Decorative', serif;
+            background: #000;
+            color: #fff;
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+            position: fixed;
+        }
+
+        #app {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Premium Background */
+        .premium-bg {
+            position: fixed;
+            width: 200%;
+            height: 200%;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(139, 0, 0, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(139, 0, 0, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 40% 80%, rgba(139, 0, 0, 0.06) 0%, transparent 50%);
+            animation: bgFloat 20s infinite alternate ease-in-out;
+        }
+
+        @keyframes bgFloat {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            100% { transform: translate(-50px, -50px) rotate(1deg); }
+        }
+
+        /* Screen System */
+        .screen {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 1.5s ease, visibility 0s 1.5s;
+            padding: 20px;
+            text-align: center;
+            pointer-events: none;
+        }
+
+        .screen.active {
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 1.5s ease, visibility 0s;
+            pointer-events: all;
+            z-index: 10;
+        }
+
+        /* Visual Effects */
+        .film-grain {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+            opacity: 0.02;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .vignette {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.9) 70%);
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        .particles {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 998;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: rgba(255, 0, 0, 0.3);
+            border-radius: 50%;
+            animation: particleFloat 10s infinite linear;
+        }
+
+        @keyframes particleFloat {
+            0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+            10% { opacity: 0.5; }
+            90% { opacity: 0.5; }
+            100% { transform: translateY(-100px) translateX(20px); opacity: 0; }
+        }
+
+        /* Navigation Arrows */
+        .nav-arrows {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1001;
+        }
+
+        .nav-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 60px;
+            height: 60px;
+            background: rgba(0,0,0,0.6);
+            border: 2px solid rgba(139,0,0,0.7);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.8rem;
+            cursor: pointer;
+            pointer-events: all;
+            transition: all 0.3s ease;
+            opacity: 0.7;
+        }
+
+        .nav-arrow:hover {
+            background: rgba(139,0,0,0.6);
+            border-color: rgba(255,0,0,0.9);
+            transform: translateY(-50%) scale(1.1);
+            opacity: 1;
+        }
+
+        .nav-arrow.left {
+            left: 20px;
+        }
+
+        .nav-arrow.right {
+            right: 20px;
+        }
+
+        .nav-arrow.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* Opening Screen */
+        .title-text {
+            font-size: 2.8rem;
+            letter-spacing: 1.2rem;
+            text-transform: uppercase;
+            text-shadow: 
+                0 0 10px rgba(255,0,0,0.3),
+                0 0 20px rgba(255,0,0,0.2),
+                0 0 30px rgba(255,0,0,0.1);
+            margin-bottom: 4rem;
+            animation: titleBreath 4s infinite alternate ease-in-out;
+            font-weight: 700;
+        }
+
+        @keyframes titleBreath {
+            0% { 
+                letter-spacing: 1.2rem;
+                text-shadow: 0 0 10px rgba(255,0,0,0.3);
+            }
+            100% { 
+                letter-spacing: 1.3rem;
+                text-shadow: 0 0 15px rgba(255,0,0,0.4);
+            }
+        }
+
+        .red-pulse {
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(139,0,0,0.4) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: deepPulse 6s infinite ease-in-out;
+            filter: blur(20px);
+        }
+
+        @keyframes deepPulse {
+            0%, 100% { opacity: 0; transform: scale(0.8); }
+            50% { opacity: 0.3; transform: scale(1.2); }
+        }
+
+        /* Wax Seal */
+        .wax-seal-container {
+            position: relative;
+            margin-top: 3rem;
+        }
+
+        .wax-seal {
+            width: 160px;
+            height: 160px;
+            background: radial-gradient(circle at 30% 30%, #8B0000, #5a0000, #3a0000);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 
+                0 0 60px rgba(139,0,0,0.8),
+                inset 0 0 40px rgba(255,255,255,0.1);
+            border: 3px solid rgba(255,255,255,0.15);
+            position: relative;
+            transition: all 0.4s ease;
+        }
+
+        .seal-icon {
+            font-size: 3.5rem;
+            color: rgba(255,255,255,0.9);
+            animation: sealGlow 3s infinite alternate;
+        }
+
+        @keyframes sealGlow {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.1); }
+        }
+
+        .hold-progress {
+            position: absolute;
+            width: 180%;
+            height: 180%;
+            border: 4px solid transparent;
+            border-top-color: rgba(255,0,0,0.8);
+            border-radius: 50%;
+            opacity: 0;
+        }
+
+        .instruction {
+            position: absolute;
+            bottom: 50px;
+            font-family: 'Playfair Display', serif;
+            font-size: 1rem;
+            color: rgba(255,255,255,0.6);
+            letter-spacing: 0.2rem;
+            animation: subtlePulse 3s infinite;
+        }
+
+        @keyframes subtlePulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        /* Birthday Message */
+        .birthday-message {
+            font-size: 2.4rem;
+            text-shadow: 0 0 15px rgba(255,0,0,0.5);
+            line-height: 1.6;
+            max-width: 85%;
+        }
+
+        .birthday-message span {
+            display: block;
+            margin-bottom: 2rem;
+            opacity: 0;
+            transform: translateY(40px);
+        }
+
+        .hearts {
+            font-size: 4.5rem;
+            margin: 3rem 0;
+            animation: heartbeat 2s infinite;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        /* Personal Letter (FOR HER) */
+        .letter-container {
+            width: 90%;
+            max-width: 550px;
+            height: 75vh;
+            position: relative;
+            margin: 2rem auto;
+        }
+
+        .letter-paper {
+            width: 100%;
+            height: 100%;
+            background: #f5e9d8;
+            border-radius: 8px;
+            padding: 40px;
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.8rem;
+            line-height: 2;
+            color: #3a2c1f;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+            overflow-y: auto;
+            position: relative;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 1.5s ease;
+        }
+
+        .letter-paper.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .letter-content p {
+            margin-bottom: 2rem;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .signature {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 1.6rem;
+            margin-top: 4rem;
+            text-align: right;
+            color: #8B0000;
+        }
+
+        /* Secret Letter Section (FOR YOU) */
+        .secret-section {
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        .secret-title {
+            font-size: 2.2rem;
+            margin-bottom: 2rem;
+            text-shadow: 0 0 20px rgba(255,0,0,0.5);
+        }
+
+        .secret-instruction {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.1rem;
+            color: rgba(255,255,255,0.8);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .secret-input-container {
+            width: 100%;
+            margin: 2rem 0;
+        }
+
+        .secret-input {
+            width: 100%;
+            height: 200px;
+            background: rgba(0,0,0,0.7);
+            border: 2px solid rgba(139,0,0,0.7);
+            border-radius: 10px;
+            color: white;
+            font-family: 'Special Elite', monospace;
+            font-size: 1.2rem;
+            padding: 20px;
+            resize: none;
+            transition: all 0.3s ease;
+        }
+
+        .secret-input:focus {
+            outline: none;
+            border-color: #ff0000;
+            box-shadow: 0 0 30px rgba(255,0,0,0.3);
+        }
+
+        .secret-btn {
+            background: linear-gradient(45deg, #8B0000, #5a0000);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(139,0,0,0.5);
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+        }
+
+        .secret-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255,0,0,0.6);
+        }
+
+        .secret-confirmation {
+            margin-top: 2rem;
+            font-size: 1.3rem;
+            color: #ff6b6b;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+        }
+
+        /* Friendship Quiz */
+        .quiz-container {
+            width: 90%;
+            max-width: 500px;
+        }
+
+        .quiz-title {
+            font-size: 2.2rem;
+            margin-bottom: 3rem;
+            text-shadow: 0 0 20px rgba(255,0,0,0.5);
+        }
+
+        .quiz-question {
+            font-size: 1.8rem;
+            margin-bottom: 2.5rem;
+            text-shadow: 0 0 15px rgba(255,0,0,0.4);
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .quiz-options {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.2rem;
+        }
+
+        .quiz-option {
+            background: rgba(139,0,0,0.2);
+            border: 2px solid rgba(139,0,0,0.4);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.3rem;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .quiz-option:hover {
+            background: rgba(139,0,0,0.4);
+            border-color: rgba(255,0,0,0.7);
+        }
+
+        /* Memory Game */
+        .memory-game {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            width: 90%;
+            max-width: 400px;
+            margin: 2rem auto;
+        }
+
+        .memory-card {
+            aspect-ratio: 1;
+            background: rgba(139,0,0,0.3);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .memory-card:hover {
+            border-color: rgba(255,0,0,0.5);
+            transform: translateY(-5px);
+        }
+
+        .memory-card.revealed {
+            background: rgba(139,0,0,0.7);
+            border-color: #ff0000;
+        }
+
+        .memory-content {
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            text-align: center;
+        }
+
+        .memory-card.revealed .memory-content {
+            opacity: 1;
+        }
+
+        /* Final Gift */
+        .gift-container {
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .gift-title {
+            font-size: 2.2rem;
+            margin-bottom: 2rem;
+            text-shadow: 0 0 20px rgba(255,0,0,0.5);
+        }
+
+        .gift-box {
+            width: 200px;
+            height: 200px;
+            background: linear-gradient(45deg, #8B0000, #5a0000);
+            border-radius: 20px;
+            margin: 2rem auto;
+            cursor: pointer;
+            position: relative;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+            transition: all 0.4s ease;
+            animation: giftFloat 3s infinite alternate;
+        }
+
+        @keyframes giftFloat {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-20px); }
+        }
+
+        .gift-box:hover {
+            transform: scale(1.05);
+            box-shadow: 0 20px 50px rgba(255,0,0,0.4);
+        }
+
+        .gift-box:before {
+            content: '💝';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 4rem;
+        }
+
+        .gift-message {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            color: rgba(255,255,255,0.9);
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 1s ease;
+        }
+
+        /* Final Screen */
+        .final-container {
+            max-width: 800px;
+            padding: 2rem;
+        }
+
+        .final-title {
+            font-size: 2.8rem;
+            margin-bottom: 2rem;
+            text-shadow: 0 0 20px rgba(255,0,0,0.6);
+        }
+
+        .final-message {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            line-height: 1.8;
+            color: rgba(255,255,255,0.95);
+            margin-bottom: 3rem;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        /* Audio Control */
+        .audio-control {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background: rgba(0,0,0,0.7);
+            border: 2px solid rgba(139,0,0,0.7);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: white;
+            font-size: 1.5rem;
+            z-index: 1001;
+            transition: all 0.3s ease;
+        }
+
+        .audio-control:hover {
+            background: rgba(139,0,0,0.5);
+            border-color: #ff0000;
+        }
+
+        /* Progress Indicator */
+        .progress-indicator {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255,255,255,0.5);
+            font-family: 'Special Elite', monospace;
+            font-size: 0.9rem;
+            z-index: 1001;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .title-text { font-size: 2rem; letter-spacing: 0.8rem; }
+            .birthday-message { font-size: 1.8rem; }
+            .letter-paper { font-size: 1.5rem; padding: 30px; }
+            .nav-arrow { width: 50px; height: 50px; font-size: 1.5rem; }
+            .memory-game { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 480px) {
+            .title-text { font-size: 1.6rem; letter-spacing: 0.5rem; }
+            .birthday-message { font-size: 1.5rem; }
+            .letter-paper { font-size: 1.3rem; padding: 20px; }
+            .nav-arrow { width: 40px; height: 40px; font-size: 1.2rem; left: 10px; right: 10px; }
+            .memory-game { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <audio id="stranger-audio" loop>
+        <source src="stranger-music.mp3" type="audio/mpeg">
+    </audio>
+    
+    <div id="app">
+        <!-- Background Effects -->
+        <div class="premium-bg"></div>
+        <div class="film-grain"></div>
+        <div class="vignette"></div>
+        <div class="particles" id="particles-container"></div>
+        
+        <!-- Navigation Arrows -->
+        <div class="nav-arrows">
+            <div class="nav-arrow left hidden" id="nav-prev">
+                <i class="fas fa-chevron-left"></i>
+            </div>
+            <div class="nav-arrow right hidden" id="nav-next">
+                <i class="fas fa-chevron-right"></i>
+            </div>
+        </div>
+        
+        <!-- Audio Control -->
+        <div class="audio-control" id="audio-control">
+            <i class="fas fa-volume-up"></i>
+        </div>
+        
+        <!-- Progress Indicator -->
+        <div class="progress-indicator" id="progress-indicator">1/8</div>
+        
+        <!-- Opening Screen -->
+        <div id="opening-screen" class="screen active">
+            <div class="red-pulse"></div>
+            <div class="title-text">A MESSAGE<br>FROM ANOTHER REALITY</div>
+            <div class="wax-seal-container">
+                <div class="wax-seal" id="wax-seal">
+                    <div class="seal-icon">❖</div>
+                    <div class="hold-progress" id="hold-progress"></div>
+                </div>
+            </div>
+            <div class="instruction">PRESS AND HOLD TO BEGIN</div>
+        </div>
+        
+        <!-- Birthday Message -->
+        <div id="birthday-screen" class="screen">
+            <div class="birthday-message" id="birthday-message">
+                <span>TODAY THE WORLD PAUSED</span>
+                <span>BECAUSE YOU TURNED 20</span>
+                <span>WISHING YOU A VERY SPECIAL</span>
+                <span>BIRTHDAY MY SWEET HEART ❤️</span>
+            </div>
+            <div class="hearts">💫</div>
+            <div class="instruction">Use arrows to navigate</div>
+        </div>
+        
+        <!-- Personal Letter (FOR HER) -->
+        <div id="letter-screen" class="screen">
+            <div class="title-text">A LETTER JUST FOR YOU</div>
+            <div class="instruction">From my heart to yours</div>
+            <div class="letter-container">
+                <div class="letter-paper" id="letter-paper">
+                    <div class="letter-content" id="letter-content">
+                        <p>My Dearest Friend,</p>
+                        <p>On your 20th birthday, I wanted to create something special that captures even a fraction of how incredible you are.</p>
+                        <p>Remember our first meeting? There was an instant connection that told me you were someone special. Your laughter, kindness, and the way you see the good in everything - that's what makes you, you.</p>
+                        <p>Through all our adventures and quiet moments, you've shown me what true friendship means. You're not just my best friend; you're family.</p>
+                        <p>On this milestone, know this: You are loved more than words can express. You are valued more than you realize. And you make this world brighter just by being in it.</p>
+                        <p class="signature">Happy 20th Birthday<br>With all my love,<br>Your Best Friend ✨</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Secret Letter Section (FOR YOU) -->
+        <div id="secret-screen" class="screen">
+            <div class="secret-section">
+                <div class="secret-title">A SECRET FOR ME</div>
+                <div class="secret-instruction">
+                    This is just for my eyes.<br>
+                    Write something special you want to tell me.<br>
+                    I'll be the only one to read this.
+                </div>
+                <div class="secret-input-container">
+                    <textarea 
+                        class="secret-input" 
+                        id="secret-input" 
+                        placeholder="Type your secret message here... 
+This will be saved only for me to read. 
+Say anything you want me to know..."></textarea>
+                </div>
+                <button class="secret-btn" id="save-secret">SEAL THIS MESSAGE</button>
+                <div class="secret-confirmation" id="secret-confirmation">
+                    Message sealed and saved! 🔒
+                </div>
+            </div>
+            <div class="instruction">Only I will see what you write here</div>
+        </div>
+        
+        <!-- Friendship Quiz -->
+        <div id="quiz-screen" class="screen">
+            <div class="quiz-container">
+                <div class="quiz-title">FRIENDSHIP TRIVIA</div>
+                <div class="instruction">Let's see how well you know us</div>
+                <div class="quiz-question" id="quiz-question"></div>
+                <div class="quiz-options" id="quiz-options"></div>
+            </div>
+        </div>
+        
+        <!-- Memory Game -->
+        <div id="memory-screen" class="screen">
+            <div class="title-text">OUR MEMORY MATCH</div>
+            <div class="instruction">Find matching memories</div>
+            <div class="memory-game" id="memory-game"></div>
+        </div>
+        
+        <!-- Virtual Gift -->
+        <div id="gift-screen" class="screen">
+            <div class="gift-container">
+                <div class="gift-title">YOUR VIRTUAL GIFT</div>
+                <div class="instruction">Open your special gift</div>
+                <div class="gift-box" id="gift-box"></div>
+                <div class="gift-message" id="gift-message"></div>
+            </div>
+        </div>
+        
+        <!-- Final Screen -->
+        <div id="final-screen" class="screen">
+            <div class="final-container">
+                <div class="final-title">TIME WELL SPENT</div>
+                <div class="final-message" id="final-message">
+                    For these few minutes, I created a world just for you.<br>
+                    Every word was genuine, every moment intentional.<br><br>
+                    This experience was my way of saying:<br>
+                    You matter. You're loved. You're extraordinary.<br><br>
+                    Happy 20th Birthday to my amazing friend.
+                </div>
+                <div class="hearts">✨ ❤️ ✨</div>
+            </div>
+            <div class="instruction">Thank you for this beautiful memory</div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Elements
+            const screens = document.querySelectorAll('.screen');
+            const navPrev = document.getElementById('nav-prev');
+            const navNext = document.getElementById('nav-next');
+            const progressIndicator = document.getElementById('progress-indicator');
+            
+            const waxSeal = document.getElementById('wax-seal');
+            const holdProgress = document.getElementById('hold-progress');
+            const birthdayMessage = document.getElementById('birthday-message');
+            const letterPaper = document.getElementById('letter-paper');
+            const letterContent = document.getElementById('letter-content');
+            const secretInput = document.getElementById('secret-input');
+            const saveSecretBtn = document.getElementById('save-secret');
+            const secretConfirmation = document.getElementById('secret-confirmation');
+            const quizQuestion = document.getElementById('quiz-question');
+            const quizOptions = document.getElementById('quiz-options');
+            const memoryGame = document.getElementById('memory-game');
+            const giftBox = document.getElementById('gift-box');
+            const giftMessage = document.getElementById('gift-message');
+            const finalMessage = document.getElementById('final-message');
+            const audioControl = document.getElementById('audio-control');
+            const strangerAudio = document.getElementById('stranger-audio');
+            const particlesContainer = document.getElementById('particles-container');
+            
+            // State
+            let currentScene = 0;
+            let totalScenes = screens.length;
+            let isHolding = false;
+            let holdTimer = null;
+            let currentQuestion = 0;
+            let revealedCards = [];
+            let matchedPairs = 0;
+            
+            // Create particles
+            function createParticles() {
+                particlesContainer.innerHTML = '';
+                for (let i = 0; i < 30; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    particle.style.left = `${Math.random() * 100}%`;
+                    particle.style.animationDelay = `${Math.random() * 10}s`;
+                    particle.style.animationDuration = `${5 + Math.random() * 10}s`;
+                    particlesContainer.appendChild(particle);
+                }
+            }
+            
+            // Update navigation
+            function updateNavigation() {
+                progressIndicator.textContent = `${currentScene + 1}/${totalScenes}`;
+                
+                // Show/hide prev arrow
+                if (currentScene > 0 && currentScene !== 0) {
+                    navPrev.classList.remove('hidden');
+                } else {
+                    navPrev.classList.add('hidden');
+                }
+                
+                // Show/hide next arrow
+                if (currentScene < totalScenes - 1 && currentScene !== 0) {
+                    navNext.classList.remove('hidden');
+                } else {
+                    navNext.classList.add('hidden');
+                }
+            }
+            
+            // Change scene
+            function changeScene(direction) {
+                const newScene = currentScene + direction;
+                
+                if (newScene >= 0 && newScene < totalScenes) {
+                    screens[currentScene].classList.remove('active');
+                    currentScene = newScene;
+                    screens[currentScene].classList.add('active');
+                    
+                    updateNavigation();
+                    initializeScene();
+                }
+            }
+            
+            // Initialize current scene
+            function initializeScene() {
+                switch(currentScene) {
+                    case 1: // Birthday message
+                        animateBirthdayMessage();
+                        break;
+                    case 2: // Letter
+                        animateLetter();
+                        break;
+                    case 4: // Quiz
+                        loadQuizQuestion();
+                        break;
+                    case 5: // Memory game
+                        initMemoryGame();
+                        break;
+                    case 6: // Gift
+                        setupGift();
+                        break;
+                    case 7: // Final
+                        animateFinalMessage();
+                        break;
+                }
+            }
+            
+            // Quiz questions
+            const quizQuestions = [
+                {
+                    question: "What's my favorite thing about our friendship?",
+                    options: [
+                        "How we understand each other",
+                        "Our endless conversations",
+                        "The adventures we share",
+                        "Everything about it"
+                    ]
+                },
+                {
+                    question: "What's our friendship's superpower?",
+                    options: [
+                        "Making each other laugh",
+                        "Supporting through anything",
+                        "Creating magical moments",
+                        "All of the above"
+                    ]
+                }
+            ];
+            
+            // Memory game pairs
+            const memoryPairs = [
+                { emoji: '🎂', text: 'Birthday' },
+                { emoji: '😂', text: 'Laughs' },
+                { emoji: '🤝', text: 'Friendship' },
+                { emoji: '✨', text: 'Magic' },
+                { emoji: '❤️', text: 'Love' },
+                { emoji: '🎉', text: 'Celebrate' }
+            ];
+            
+            // Navigation events
+            navPrev.addEventListener('click', () => changeScene(-1));
+            navNext.addEventListener('click', () => changeScene(1));
+            
+            // Keyboard navigation
+            document.addEventListener('keydown', (e) => {
+                if (currentScene === 0) return; // Don't allow navigation on opening screen
+                
+                if (e.key === 'ArrowLeft') {
+                    changeScene(-1);
+                } else if (e.key === 'ArrowRight') {
+                    changeScene(1);
+                }
+            });
+            
+            // Wax seal interaction
+            waxSeal.addEventListener('touchstart', startHold, { passive: false });
+            waxSeal.addEventListener('mousedown', startHold);
+            
+            waxSeal.addEventListener('touchend', cancelHold);
+            waxSeal.addEventListener('mouseup', cancelHold);
+            waxSeal.addEventListener('mouseleave', cancelHold);
+            
+            function startHold(e) {
+                e.preventDefault();
+                if (isHolding) return;
+                
+                isHolding = true;
+                waxSeal.style.transform = 'scale(0.95)';
+                waxSeal.style.boxShadow = '0 0 80px rgba(255,0,0,0.9)';
+                
+                holdProgress.style.opacity = '1';
+                holdProgress.style.animation = 'progressRotate 3s linear';
+                
+                // Start audio
+                strangerAudio.volume = 0.3;
+                strangerAudio.play().catch(() => {
+                    audioControl.innerHTML = '<i class="fas fa-play-circle"></i>';
+                });
+                
+                holdTimer = setTimeout(completeHold, 3000);
+            }
+            
+            function cancelHold() {
+                if (!isHolding) return;
+                
+                clearTimeout(holdTimer);
+                isHolding = false;
+                waxSeal.style.transform = '';
+                waxSeal.style.boxShadow = '';
+                holdProgress.style.opacity = '0';
+                holdProgress.style.animation = 'none';
+            }
+            
+            function completeHold() {
+                if (!isHolding) return;
+                
+                waxSeal.style.boxShadow = '0 0 100px rgba(255,0,0,1)';
+                
+                // Move to next scene
+                setTimeout(() => {
+                    screens[currentScene].classList.remove('active');
+                    currentScene = 1;
+                    screens[currentScene].classList.add('active');
+                    
+                    updateNavigation();
+                    animateBirthdayMessage();
+                }, 1000);
+            }
+            
+            function animateBirthdayMessage() {
+                const spans = birthdayMessage.querySelectorAll('span');
+                spans.forEach((span, index) => {
+                    setTimeout(() => {
+                        span.style.opacity = '1';
+                        span.style.transform = 'translateY(0)';
+                        span.style.transition = 'opacity 1s ease, transform 1s ease';
+                    }, index * 1000);
+                });
+            }
+            
+            function animateLetter() {
+                letterPaper.classList.add('active');
+                
+                const paragraphs = letterContent.querySelectorAll('p');
+                paragraphs.forEach((para, index) => {
+                    setTimeout(() => {
+                        para.style.opacity = '1';
+                        para.style.transform = 'translateY(0)';
+                        para.style.transition = 'opacity 1.5s ease, transform 1.5s ease';
+                    }, index * 1500);
+                });
+            }
+            
+            // Secret message handling
+            saveSecretBtn.addEventListener('click', function() {
+                const message = secretInput.value.trim();
+                if (message) {
+                    // In a real app, you would save this to a database
+                    console.log("Secret message saved:", message);
+                    
+                    // Visual feedback
+                    saveSecretBtn.disabled = true;
+                    saveSecretBtn.textContent = "MESSAGE SAVED";
+                    saveSecretBtn.style.background = 'linear-gradient(45deg, #228B22, #006400)';
+                    
+                    secretConfirmation.style.opacity = '1';
+                    secretConfirmation.style.transform = 'translateY(0)';
+                    
+                    // Clear input after a moment
+                    setTimeout(() => {
+                        secretInput.value = '';
+                    }, 1000);
+                }
+            });
+            
+            function loadQuizQuestion() {
+                if (currentQuestion >= quizQuestions.length) {
+                    currentQuestion = 0;
+                }
+                
+                const question = quizQuestions[currentQuestion];
+                quizQuestion.textContent = question.question;
+                quizOptions.innerHTML = '';
+                
+                question.options.forEach((option, index) => {
+                    const button = document.createElement('div');
+                    button.className = 'quiz-option';
+                    button.textContent = option;
+                    
+                    setTimeout(() => {
+                        button.style.opacity = '1';
+                        button.style.transform = 'translateY(0)';
+                        button.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+                    }, index * 400);
+                    
+                    button.addEventListener('click', () => {
+                        // Highlight selection
+                        quizOptions.querySelectorAll('.quiz-option').forEach(opt => {
+                            opt.style.background = 'rgba(139,0,0,0.2)';
+                        });
+                        button.style.background = 'rgba(255,0,0,0.4)';
+                        
+                        // Move to next question after delay
+                        setTimeout(() => {
+                            currentQuestion++;
+                            if (currentQuestion < quizQuestions.length) {
+                                loadQuizQuestion();
+                            }
+                        }, 1000);
+                    });
+                    
+                    quizOptions.appendChild(button);
+                });
+                
+                setTimeout(() => {
+                    quizQuestion.style.opacity = '1';
+                    quizQuestion.style.transform = 'translateY(0)';
+                    quizQuestion.style.transition = 'opacity 1s ease, transform 1s ease';
+                }, 300);
+            }
+            
+            function initMemoryGame() {
+                memoryGame.innerHTML = '';
+                revealedCards = [];
+                matchedPairs = 0;
+                
+                // Duplicate and shuffle
+                let cards = [...memoryPairs, ...memoryPairs];
+                cards.sort(() => Math.random() - 0.5);
+                
+                cards.forEach((pair, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'memory-card';
+                    card.dataset.index = index;
+                    card.dataset.emoji = pair.emoji;
+                    
+                    const content = document.createElement('div');
+                    content.className = 'memory-content';
+                    content.innerHTML = `${pair.emoji}<br><small>${pair.text}</small>`;
+                    
+                    card.appendChild(content);
+                    card.addEventListener('click', () => revealCard(card));
+                    
+                    memoryGame.appendChild(card);
+                });
+            }
+            
+            function revealCard(card) {
+                if (revealedCards.length >= 2 || card.classList.contains('revealed')) return;
+                
+                card.classList.add('revealed');
+                revealedCards.push(card);
+                
+                if (revealedCards.length === 2) {
+                    const [card1, card2] = revealedCards;
+                    
+                    if (card1.dataset.emoji === card2.dataset.emoji) {
+                        matchedPairs++;
+                        revealedCards = [];
+                        
+                        if (matchedPairs === memoryPairs.length) {
+                            memoryGame.innerHTML = '<div style="font-size: 2rem; padding: 2rem;">Perfect Memory! ✨</div>';
+                        }
+                    } else {
+                        setTimeout(() => {
+                            card1.classList.remove('revealed');
+                            card2.classList.remove('revealed');
+                            revealedCards = [];
+                        }, 1000);
+                    }
+                }
+            }
+            
+            function setupGift() {
+                giftBox.addEventListener('click', () => {
+                    giftBox.style.transform = 'scale(1.1)';
+                    giftBox.style.boxShadow = '0 25px 60px rgba(255,0,0,0.5)';
+                    
+                    giftMessage.innerHTML = `
+                        <div style="text-align: center; font-size: 1.3rem; line-height: 1.6;">
+                            Your Gift: A Promise<br><br>
+                            ✨ To always be here for you<br>
+                            ❤️ To cherish our friendship forever<br>
+                            🎉 To celebrate every moment together<br><br>
+                            Happy 20th Birthday!
+                        </div>
+                    `;
+                    
+                    setTimeout(() => {
+                        giftMessage.style.opacity = '1';
+                        giftMessage.style.transform = 'translateY(0)';
+                    }, 500);
+                });
+            }
+            
+            function animateFinalMessage() {
+                setTimeout(() => {
+                    finalMessage.style.opacity = '1';
+                    finalMessage.style.transform = 'translateY(0)';
+                    finalMessage.style.transition = 'opacity 1.5s ease, transform 1.5s ease';
+                }, 500);
+            }
+            
+            // Audio control
+            audioControl.addEventListener('click', () => {
+                if (strangerAudio.paused) {
+                    strangerAudio.play();
+                    audioControl.innerHTML = '<i class="fas fa-volume-up"></i>';
+                } else {
+                    strangerAudio.pause();
+                    audioControl.innerHTML = '<i class="fas fa-volume-mute"></i>';
+                }
+            });
+            
+            // Initialize
+            createParticles();
+            updateNavigation();
+            
+            // Auto-start pulse
+            setTimeout(() => {
+                document.querySelector('.red-pulse').style.opacity = '1';
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
